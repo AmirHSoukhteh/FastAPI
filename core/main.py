@@ -28,7 +28,16 @@ async def retrieve_name_detail(name_id:int):
     for name in names_list:
         if name["id"] == name_id:
             return name
-    return {"detail": "name didn't find."}
+    return {"detail": "object didn't find."}
+
+@app.put("/names/{id}")
+async def update_name_detail(name_id:int, name:str):
+    for item in names_list:
+        if item in names_list:
+            if item["id"] == name_id:
+                item["name"] = name
+                return item
+    return {"detail": "object didn't find."}
 
 @app.get("/")
 async def root():
