@@ -1,7 +1,17 @@
 from fastapi import FastAPI, Query, status, HTTPException, Path, Body
 from fastapi.responses import JSONResponse
 from itertools import count
-app = FastAPI()
+
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+
+    print("Application startup")
+    yield
+    print("Application shutdown")
+
+app = FastAPI(lifespan=lifespan)
 
 costs_list = [
     {"id":1, "description": "tax", "cost": 10},
