@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import random
 app = FastAPI()
 
@@ -13,7 +13,9 @@ names_list = [
 
 # /names (GET(RETRIEVE), POST(CREATE))
 @app.get("/names")
-async def retrieve_names_list():
+async def retrieve_names_list(q : str | None = Query(default=None, max_length=50)):
+    if q:
+        return [item for item in names_list if q in item["name"]]
     return names_list
 
 @app.post("/names")
