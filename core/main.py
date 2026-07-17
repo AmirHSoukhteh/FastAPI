@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-
+import random
 app = FastAPI()
 
 names_list = [
@@ -15,6 +15,12 @@ names_list = [
 @app.get("/names")
 async def retrieve_names_list():
     return names_list
+
+@app.post("/names")
+async def create_name(name:str):
+    name_obj = {"id": random.randint(6, 100), "name": name}
+    names_list.append(name_obj)
+    return name_obj
 
 # /names/:id (GET(RETRIEVE), PUT/PATCH(UPDATE), DELETE)
 @app.get("/names/{id}")
