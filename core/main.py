@@ -14,7 +14,15 @@ names_list = [
 
 # /names (GET(RETRIEVE), POST(CREATE))
 @app.get("/names")
-async def retrieve_names_list(q : str | None = Query(default=None, max_length=50)):
+async def retrieve_names_list(
+    q : str | None = Query(
+        alias="search",
+        description="It will search with title you provided",
+        example="ali",
+        default=None, 
+        max_length=50
+    )
+):
     result = names_list
     if q:
         result =  [item for item in names_list if q in item["name"]]
