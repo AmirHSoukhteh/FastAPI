@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, status, HTTPException, Path
+from fastapi import FastAPI, Query, status, HTTPException, Path, Body
 from fastapi.responses import JSONResponse
 import random
 app = FastAPI()
@@ -29,7 +29,11 @@ async def retrieve_names_list(
     return JSONResponse(content=result, status_code=status.HTTP_200_OK)
 
 @app.post("/names")
-async def create_name(name:str):
+async def create_name(
+    name:str | None = Body(
+        embed=True,    
+    )
+):
     name_obj = {"id": random.randint(6, 100), "name": name}
     names_list.append(name_obj)
     return JSONResponse(content=name_obj, status_code=status.HTTP_201_CREATED)
@@ -39,7 +43,6 @@ async def create_name(name:str):
 async def retrieve_name_detail(
     name_id:int = Path
     (
-        alias="object_id",
         title="object id",
         description="the id of name in names_list",
         ge=1,
@@ -52,7 +55,18 @@ async def retrieve_name_detail(
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="object didn't find.") 
 
 @app.put("/names/{name_id}")
-async def update_name_detail(name_id:int, name:str):
+async def update_name_detail(
+    name_id:int = Path
+    (
+        title="object id",
+        description="the id of name in names_list",
+        ge=1,
+        example=5
+    ),
+    name:str | None = Body(
+        embed=True,    
+    )
+):
     for item in names_list:
         if item["id"] == name_id:
             item["name"] = name
@@ -60,7 +74,15 @@ async def update_name_detail(name_id:int, name:str):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="object didn't find.") 
 
 @app.delete("/names/{name_id}")
-async def delete_name(name_id:int):
+async def delete_name(
+    name_id:int = Path
+    (
+        title="object id",
+        description="the id of name in names_list",
+        ge=1,
+        example=5
+    )
+):
     for item in names_list:
         if item["id"] == name_id:
             names_list.remove(item)
