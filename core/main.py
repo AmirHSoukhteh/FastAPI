@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, status, HTTPException
+from fastapi import FastAPI, Query, status, HTTPException, Path
 from fastapi.responses import JSONResponse
 import random
 app = FastAPI()
@@ -36,7 +36,16 @@ async def create_name(name:str):
 
 # /names/:id (GET(RETRIEVE), PUT/PATCH(UPDATE), DELETE)
 @app.get("/names/{name_id}")
-async def retrieve_name_detail(name_id:int):
+async def retrieve_name_detail(
+    name_id:int = Path
+    (
+        alias="object_id",
+        title="object id",
+        description="the id of name in names_list",
+        ge=1,
+        example=5
+    )
+):
     for name in names_list:
         if name["id"] == name_id:
             return JSONResponse(content=name, status_code=status.HTTP_200_OK)
