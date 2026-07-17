@@ -1,93 +1,46 @@
 from fastapi import FastAPI, Query, status, HTTPException, Path, Body
 from fastapi.responses import JSONResponse
-import random
+from itertools import count
 app = FastAPI()
 
-names_list = [
-    {"id":1, "name":"ali"},
-    {"id":2, "name":"amir"},
-    {"id":3, "name":"bahram"},
-    {"id":4, "name":"cohon"},
-    {"id":5, "name":"dani"},
-    {"id":6, "name":"ebrahim"},
-]
+cost_list = []
 
 # /names (GET(RETRIEVE), POST(CREATE))
-@app.get("/names")
+@app.get("/costs")
 async def retrieve_names_list(
     q : str | None = Query(
         alias="search",
         description="It will search with title you provided",
-        example="ali",
+        example="tax",
         default=None, 
         max_length=50
     )
 ):
-    result = names_list
+    result = cost_list
     if q:
-        result =  [item for item in names_list if q in item["name"]]
+        result =  [item for item in cost_list if q in item["description"]]
     return JSONResponse(content=result, status_code=status.HTTP_200_OK)
 
-@app.post("/names")
+id_index = count(start=1)
+
+@app.post("/costs")
 async def create_name(
-    name:str | None = Body(
-        embed=True,    
-    )
-):
-    name_obj = {"id": random.randint(6, 100), "name": name}
-    names_list.append(name_obj)
-    return JSONResponse(content=name_obj, status_code=status.HTTP_201_CREATED)
-
-# /names/:id (GET(RETRIEVE), PUT/PATCH(UPDATE), DELETE)
-@app.get("/names/{name_id}")
-async def retrieve_name_detail(
-    name_id:int = Path
+    description:str | None = Body
     (
-        title="object id",
-        description="the id of name in names_list",
-        ge=1,
-        example=5
-    )
-):
-    for name in names_list:
-        if name["id"] == name_id:
-            return JSONResponse(content=name, status_code=status.HTTP_200_OK)
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="object didn't find.") 
-
-@app.put("/names/{name_id}")
-async def update_name_detail(
-    name_id:int = Path
-    (
-        title="object id",
-        description="the id of name in names_list",
-        ge=1,
-        example=5
+        default= "I don't know!",
+        description= "Why are you spending this money?"
     ),
-    name:str | None = Body(
-        embed=True,    
-    )
-):
-    for item in names_list:
-        if item["id"] == name_id:
-            item["name"] = name
-            return JSONResponse(content=item, status_code=status.HTTP_200_OK)
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="object didn't find.") 
-
-@app.delete("/names/{name_id}")
-async def delete_name(
-    name_id:int = Path
+    cost:int | None = Body
     (
-        title="object id",
-        description="the id of name in names_list",
-        ge=1,
-        example=5
-    )
+        default= 0,
+        description= "How much money do you spend?"
+    ),
 ):
-    for item in names_list:
-        if item["id"] == name_id:
-            names_list.remove(item)
-            return JSONResponse(content={"detail": "object delete successfully."}, status_code=status.HTTP_204_NO_CONTENT)
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="object didn't find.") 
+    cost_obj = {
+        "id": next(id_index), 
+        "description": description, 
+        "cost":cost
+        }
 
 @app.get("/")
 async def root():
