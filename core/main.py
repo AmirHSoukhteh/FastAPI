@@ -23,20 +23,27 @@ async def create_name(name:str):
     return name_obj
 
 # /names/:id (GET(RETRIEVE), PUT/PATCH(UPDATE), DELETE)
-@app.get("/names/{id}")
+@app.get("/names/{name_id}")
 async def retrieve_name_detail(name_id:int):
     for name in names_list:
         if name["id"] == name_id:
             return name
     return {"detail": "object didn't find."}
 
-@app.put("/names/{id}")
+@app.put("/names/{name_id}")
 async def update_name_detail(name_id:int, name:str):
     for item in names_list:
-        if item in names_list:
-            if item["id"] == name_id:
-                item["name"] = name
-                return item
+        if item["id"] == name_id:
+            item["name"] = name
+            return item
+    return {"detail": "object didn't find."}
+
+@app.delete("/names/{name_id}")
+async def delete_name(name_id:int):
+    for item in names_list:
+        if item["id"] == name_id:
+            names_list.remove(item)
+            return {"detail": "object delete successfully."}
     return {"detail": "object didn't find."}
 
 @app.get("/")
