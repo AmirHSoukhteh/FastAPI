@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Query, status, HTTPException, Path, Body
 from fastapi.responses import JSONResponse
 import random
-
+from schema import PersonCreateSchema, PersonRespondSchema, PersonUpdateSchema
+from typing import List
 
 from contextlib import asynccontextmanager
 
@@ -24,7 +25,7 @@ names_list = [
 ]
 
 # /names (GET(RETRIEVE), POST(CREATE))
-@app.get("/names")
+@app.get("/names", response_model=List[PersonRespondSchema])
 async def retrieve_names_list(
     q : str | None = Query(
         alias="search",
@@ -39,18 +40,14 @@ async def retrieve_names_list(
         result =  [item for item in names_list if q in item["name"]]
     return JSONResponse(content=result, status_code=status.HTTP_200_OK)
 
-@app.post("/names")
-async def create_name(
-    name:str | None = Body(
-        embed=True,    
-    )
-):
-    name_obj = {"id": random.randint(6, 100), "name": name}
+@app.post("/names", response_model=PersonRespondSchema)
+async def create_name(person:PersonCreateSchema):
+    name_obj = {"id": random.randint(6, 100), "name": person.name}
     names_list.append(name_obj)
     return JSONResponse(content=name_obj, status_code=status.HTTP_201_CREATED)
 
 # /names/:id (GET(RETRIEVE), PUT/PATCH(UPDATE), DELETE)
-@app.get("/names/{name_id}")
+@app.get("/names/{name_id}", response_model=PersonRespondSchema)
 async def retrieve_name_detail(
     name_id:int = Path
     (
@@ -65,8 +62,9 @@ async def retrieve_name_detail(
             return JSONResponse(content=name, status_code=status.HTTP_200_OK)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="object didn't find.") 
 
-@app.put("/names/{name_id}")
+@app.put("/names/{name_id}", response_model=PersonRespondSchema)
 async def update_name_detail(
+    person : PersonUpdateSchema,
     name_id:int = Path
     (
         title="object id",
@@ -74,13 +72,11 @@ async def update_name_detail(
         ge=1,
         example=5
     ),
-    name:str | None = Body(
-        embed=True,    
-    )
+    
 ):
     for item in names_list:
         if item["id"] == name_id:
-            item["name"] = name
+            item["name"] = person.name
             return JSONResponse(content=item, status_code=status.HTTP_200_OK)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="object didn't find.") 
 
