@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 Base = declarative_base()
 
 # URL پایگاه داده SQLite
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./sqlite.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver:5432/test.db"
 # SQLALCHEMY_DATABASE_URL = "mysql://user:password@localhost/test.db"
 
