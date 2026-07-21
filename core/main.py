@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 import random
 from schema import PersonCreateSchema, PersonRespondSchema, PersonUpdateSchema
 from typing import List
+from database import Base, engine
 
 from contextlib import asynccontextmanager
 
@@ -10,6 +11,8 @@ from contextlib import asynccontextmanager
 async def lifespan(app:FastAPI):
 
     print("Application startup")
+    Base.metadata.create_all(bind=engine)
+
     yield
     print("Application shutdown")
 
