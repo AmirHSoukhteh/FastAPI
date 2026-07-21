@@ -24,3 +24,10 @@ class Person(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String())
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
